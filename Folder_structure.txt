@@ -1,0 +1,17 @@
+project/
+│
+├── public/
+│   ├── index.php        # API router
+│   ├── app/             # Your front-end (HTML/CSS/JS)
+│   │   ├── index.html
+│   │   ├── css/
+│   │   └── js/
+│   └── assets/
+│
+├── src/                 # API logic
+│   ├── Controllers/
+│   ├── Models/
+│   ├── Database/
+│   └── Helpers/
+│
+└── config/
