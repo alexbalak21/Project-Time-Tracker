@@ -1,5 +1,7 @@
 <?php
 
+require __DIR__ . '/../src/bootstrap.php';
+
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $uri = rtrim($uri, '/');
 
@@ -8,14 +10,6 @@ if ($uri === '') {
 }
 
 if (strpos($uri, '/api') === 0) {
-    require __DIR__ . '/../src/Helpers/ApiResponder.php';
-    require __DIR__ . '/../src/Database/JsonStorage.php';
-    require __DIR__ . '/../src/Controllers/BaseController.php';
-    require __DIR__ . '/../src/Controllers/UserController.php';
-    require __DIR__ . '/../src/Controllers/ProjectController.php';
-    require __DIR__ . '/../src/Controllers/TaskController.php';
-    require __DIR__ . '/../src/Controllers/TimeEntryController.php';
-
     $resource = trim(str_replace('/api', '', $uri), '/');
     $segments = $resource === '' ? array() : explode('/', $resource);
     $method = $_SERVER['REQUEST_METHOD'];

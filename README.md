@@ -167,4 +167,4 @@ This project now exposes a simple JSON CRUD API for the four core entities.
 | tasks | `GET /api/tasks` | `GET /api/tasks/{id}` |
 | time-entries | `GET /api/time-entries` | `GET /api/time-entries/{id}` |
 
-`POST`, `PUT`, `PATCH`, and `DELETE` are supported on the matching item routes. Data is stored as JSON files under `storage/data`, so the API runs without a database setup.
+`POST`, `PUT`, `PATCH`, and `DELETE` are supported on the matching item routes. The API now uses MySQL through PDO. See [config/database.php](config/database.php) and [config/schema.sql](config/schema.sql) for setup.
