@@ -151,3 +151,20 @@ SELECT *
 FROM tasks
 WHERE project_id = :projectId
    OR is_generic = true;
+
+```
+
+---
+
+# 🌐 API Summary
+
+This project now exposes a simple JSON CRUD API for the four core entities.
+
+| Resource | List/Create | Item Read/Update/Delete |
+|----------|-------------|-------------------------|
+| users | `GET /api/users` | `GET /api/users/{id}` |
+| projects | `GET /api/projects` | `GET /api/projects/{id}` |
+| tasks | `GET /api/tasks` | `GET /api/tasks/{id}` |
+| time-entries | `GET /api/time-entries` | `GET /api/time-entries/{id}` |
+
+`POST`, `PUT`, `PATCH`, and `DELETE` are supported on the matching item routes. Data is stored as JSON files under `storage/data`, so the API runs without a database setup.

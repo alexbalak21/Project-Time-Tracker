@@ -1,47 +1,78 @@
 <?php
 
-// Get the requested path (without query string)
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-
-// Normalize (remove trailing slash except root)
 $uri = rtrim($uri, '/');
-if ($uri === '') $uri = '/';
 
-// --- API ROUTES -------------------------------------------------------------
+if ($uri === '') {
+    $uri = '/';
+}
 
 if (strpos($uri, '/api') === 0) {
+    require __DIR__ . '/../src/Helpers/ApiResponder.php';
+    require __DIR__ . '/../src/Database/JsonStorage.php';
+    require __DIR__ . '/../src/Controllers/BaseController.php';
+    require __DIR__ . '/../src/Controllers/UserController.php';
+    require __DIR__ . '/../src/Controllers/ProjectController.php';
+    require __DIR__ . '/../src/Controllers/TaskController.php';
+    require __DIR__ . '/../src/Controllers/TimeEntryController.php';
 
-    header('Content-Type: application/json');
+    $resource = trim(str_replace('/api', '', $uri), '/');
+    $segments = $resource === '' ? array() : explode('/', $resource);
+    $method = $_SERVER['REQUEST_METHOD'];
 
-    // Example: /api/projects
-    if ($uri === '/api/projects') {
-        require __DIR__ . '/../src/Controllers/ProjectController.php';
-        (new ProjectController)->index();
+    $controllers = array(
+        'users' => new UserController(),
+        'projects' => new ProjectController(),
+        'tasks' => new TaskController(),
+        'time-entries' => new TimeEntryController(),
+    );
+
+    if (count($segments) === 0) {
+        ApiResponder::json(array(
+            'message' => 'Time Tracker API',
+            'resources' => array_keys($controllers),
+        ));
         exit;
     }
 
-    // Example: /api/tasks
-    if ($uri === '/api/tasks') {
-        require __DIR__ . '/../src/Controllers/TaskController.php';
-        (new TaskController)->index();
+    $resourceName = $segments[0];
+
+    if (!isset($controllers[$resourceName])) {
+        ApiResponder::json(array('error' => 'API endpoint not found'), 404);
         exit;
     }
 
-    // Example: /api/time-entries
-    if ($uri === '/api/time-entries') {
-        require __DIR__ . '/../src/Controllers/TimeEntryController.php';
-        (new TimeEntryController)->index();
+    $controller = $controllers[$resourceName];
+    $id = isset($segments[1]) ? (int) $segments[1] : null;
+
+    if ($method === 'GET' && $id === null) {
+        $controller->index($_GET);
         exit;
     }
 
-    // Default API 404
-    http_response_code(404);
-    echo json_encode(["error" => "API endpoint not found"]);
+    if ($method === 'GET' && $id !== null) {
+        $controller->show($id);
+        exit;
+    }
+
+    if ($method === 'POST' && $id === null) {
+        $controller->store();
+        exit;
+    }
+
+    if (in_array($method, array('PUT', 'PATCH'), true) && $id !== null) {
+        $controller->update($id);
+        exit;
+    }
+
+    if ($method === 'DELETE' && $id !== null) {
+        $controller->destroy($id);
+        exit;
+    }
+
+    ApiResponder::json(array('error' => 'Method not allowed'), 405);
     exit;
 }
 
-// --- FRONT-END ROUTE --------------------------------------------------------
-
-// Anything that is NOT /api goes to your front-end
 require __DIR__ . '/app/index.php';
 exit;
